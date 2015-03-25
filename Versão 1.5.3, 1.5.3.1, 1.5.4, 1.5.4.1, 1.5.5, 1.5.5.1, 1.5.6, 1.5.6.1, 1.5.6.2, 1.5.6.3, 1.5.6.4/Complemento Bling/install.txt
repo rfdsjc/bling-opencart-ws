@@ -1,0 +1,207 @@
+####################################################
+####################################################
+############  ORGANISYS SOFTWARE LTDA.  ############
+####################################################
+############    VERSÃO 1.0 - 03/2015    ############
+####################################################
+####################################################
+
+
+1)- 
+----------------------------------------------- --------------
+Por favor, verifique se você tem um backup VÁLIDO dos seguintes arquivos:
+\catalog\model\account\order.php 
+\catalog\model\catalog\product.php  
+
+OBS: Não nos responsabilizamos por má instalação.
+-------------------------------------------------- --------------
+
+2)- 
+A implantação do plugin pode ser feita de duas maneiras
+2.1 - Copiando os arquivos para dentro de suas pastas
+	OBS: Você vai notar que as pastas estão na mesma estrutura que a sua instalação OpenCart.
+2.2 - Colando os códigos dos itens 2.2.1 e 2.2.2 respectivamente.
+
+
+-------------------------------------------------- --------------
+
+
+2.2.1)- 
+-------------------------------------------------- --------------
+colar código, antes da última marca de fechamento: ( \catalog\model\account\order.php )
+
+
+	//Plugin
+	public function getAllOrders($start = 0, $limit = 20) {
+		if ($start < 0) {
+			$start = 0;
+		}
+
+		if ($limit < 1) {
+			$limit = 1;
+		}
+
+		$query = $this->db->query("SELECT o.order_id, o.firstname, o.lastname,o.email, o.telephone, o.total, o.currency_code, o.currency_value, o.customer_id,o.date_added,o.payment_firstname,o.payment_lastname,o.payment_company,o.payment_address_1,o.payment_address_2,o.payment_city,o.payment_postcode,o.payment_country,o.payment_zone,o.payment_method,o.payment_code,o.shipping_firstname,o.shipping_lastname,o.shipping_company,o.shipping_address_1,o.shipping_address_2,o.shipping_city,o.shipping_postcode,o.shipping_country,o.shipping_zone,o.shipping_method,o.shipping_code,o.comment, os.name as status
+								   FROM `" . DB_PREFIX . "order` o LEFT JOIN " . DB_PREFIX . "order_status os ON (o.order_status_id = os.order_status_id) 
+								   WHERE o.order_status_id > '0'  ORDER BY o.order_id DESC LIMIT " . (int)$start . "," . (int)$limit
+								  );
+		return $query->rows;
+		
+	}
+	
+	//ORDERS BY FILTERS
+	public function getAllOrdersFilters($start = 0, $limit = 20, $filters) {
+		if ($start < 0) {
+			$start = 0;
+		}
+		if ($limit < 1) {
+			$limit = 1;
+		}
+		$filters = urldecode($filters);
+		$filter = explode('|', $filters);
+		
+		$startDate = $filter[0];
+		$finishDate = $filter[1];
+		$status = $filter[2];
+		
+		if(empty($startDate)){
+			$startDate = '1969-01-01';
+		}
+		if(empty($finishDate)){
+			$finishDate = date('Y-m-d');
+		}
+		$sql = "SELECT o.order_id, o.firstname, o.lastname, o.email, o.telephone, o.total, o.currency_code, o.currency_value, o.customer_id,o.date_added,o.payment_firstname,o.payment_lastname,o.payment_company,o.payment_address_1,o.payment_address_2,o.payment_city,o.payment_postcode,o.payment_country,o.payment_zone,o.payment_method,o.payment_code,o.shipping_firstname,o.shipping_lastname,o.shipping_company,o.shipping_address_1,o.shipping_address_2,o.shipping_city,o.shipping_postcode,o.shipping_country,o.shipping_zone,o.shipping_method,o.shipping_code,o.comment, os.name as status
+								   FROM `" . DB_PREFIX . "order` o LEFT JOIN " . DB_PREFIX . "order_status os ON (o.order_status_id = os.order_status_id)
+								   WHERE ";
+		if($status == 'tds'){
+			$sql .= "o.order_status_id > 0";
+		}else{
+			$sql .= "o.order_status_id = '".$status."'";
+		}
+		$sql .= " AND ( o.date_added BETWEEN '".$startDate."' AND '".$finishDate."')  ORDER BY o.order_id DESC LIMIT " . (int)$start . "," . (int)$limit;
+		
+		$query = $this->db->query($sql);		
+		return $query->rows;
+	}
+
+	//ORDER BY ID
+	public function getOrderId($order_id){
+		$query = $this->db->query("SELECT o.order_id, o.firstname, o.customer_id, o.lastname,  o.email, o.telephone, os.name as status, o.date_added, o.total, o.currency_code, o.currency_value, o.payment_firstname,o.payment_lastname,o.payment_company,o.payment_address_1,o.payment_address_2,o.payment_city,o.payment_postcode,o.payment_country,o.payment_zone,o.payment_method,o.payment_code,o.shipping_firstname,o.shipping_lastname,o.shipping_company,o.shipping_address_1,o.shipping_address_2,o.shipping_city,o.shipping_postcode,o.shipping_country,o.shipping_zone,o.shipping_method,o.shipping_code,o.comment 
+								   FROM `" . DB_PREFIX . "order` o LEFT JOIN " . DB_PREFIX . "order_status os ON (o.order_status_id = os.order_status_id)  
+								   WHERE o.order_id = '".$order_id."'"
+								);
+		return $query->rows;
+	}
+	
+	//GETTING COUPON BY ORDER
+	public function getCouponByOrder($order_id){
+		$query = $this->db->query("SELECT  ot.value as valueCoupon, ot.code as codeCoupon
+								   FROM " . DB_PREFIX . "order_total ot
+								   WHERE ot.order_id = '".$order_id."'  AND (ot.code = 'coupon' or  ot.code = 'cupom') 
+								   GROUP BY ot.value"
+								  );
+		return $query->rows;
+	}
+	
+	//GETTING SHIPPING PRICE BY ORDER
+	public function getShippingByOrder($order_id){
+		$query = $this->db->query("SELECT  ot.value as valueShipping, ot.code as codeShipping
+								   FROM " . DB_PREFIX . "order oo, " . DB_PREFIX . "order_total ot
+								   WHERE ot.order_id = '".$order_id."' AND ( ot.code ='shipping' or ot.code = 'frete')
+							 	   GROUP BY ot.value"
+		);
+		return $query->rows;
+	}
+	
+	//PRODUCTS BY ID ORDER
+	public function getProductOrderId($order_id){
+		$query = $this->db->query("SELECT o.order_product_id, o.product_id, o.name, o.model, o.quantity, o.price, o.total, o.tax, o.reward, p.sku
+								   FROM `" . DB_PREFIX . "order_product` o LEFT JOIN " . DB_PREFIX . "product p ON (o.product_id = p.product_id) 
+								   WHERE `order_id` = '".$order_id."'"
+								);
+		return $query->rows;
+	}
+
+
+
+
+
+2.2.2)-
+-------------------------------------------------- --------------
+colar código, antes da última marca de fechamento: ( \catalog\model\catalog\product.php)
+
+
+	//Plugin
+	public function getAllProduct(){
+		$query = $this->db->query("SELECT pd.product_id, pd.name, pd.description, p.model, p.sku, p.quantity, p.price, p.weight, p.length, p.width, p.height,p.date_added, pa.text AS attribute
+								   FROM " . DB_PREFIX . "product p, " . DB_PREFIX . "product_description pd, " . DB_PREFIX . "product_attribute pa
+								   WHERE (p.product_id = pd.product_id OR p.product_id = pa.product_id)
+								   GROUP BY p.product_id"
+							      );
+		return $query->rows;
+	}
+	
+	//Products by filters
+	public function getAllProductFilters($filters){
+		$filters = urldecode($filters);
+		$filter = explode('|', $filters);
+		$startDate = $filter[0];
+		$finishDate = $filter[1];
+		
+		if($startDate == date('Y-m-d')){
+			$d = date('d') +1;
+			$y = date('Y');
+			$m = date('m'); 
+			$finishDate = $y."-".$m ."-".$d;
+		}
+
+		$query = $this->db->query("SELECT pd.product_id, pd.name, pd.description, p.model, p.sku, p.quantity, p.price, p.weight, p.length, p.width, p.height,p.date_added, pa.text AS attribute
+								   FROM " . DB_PREFIX . "product p, " . DB_PREFIX . "product_description pd, " . DB_PREFIX . "product_attribute pa
+								   WHERE (p.product_id = pd.product_id OR p.product_id = pa.product_id) AND ( p.date_added BETWEEN '".$startDate."' AND '".$finishDate."') 
+								   GROUP BY p.product_id"
+		);
+		return $query->rows;
+	}
+	
+	
+	//Products by filters
+	public function getCountProduct(){
+		$query = $this->db->query("SELECT COUNT(product_id) as NrProducts FROM " . DB_PREFIX . "product ");
+		return $query->rows;
+	}
+	
+	//Insert products
+	public function insert_oc_products($parameter){
+			if(strlen($parameter->descricaoComplementar) > 64){
+				$parameter->descricaoComplementar = substr($parameter->descricaoComplementar, 0, 64);
+			}
+						
+			$sql = $this->db->query("INSERT INTO " . DB_PREFIX . "product (model, sku, upc, ean, jan, isbn, mpn, location, quantity, stock_status_id, image, manufacturer_id, shipping, price, points, tax_class_id, date_available, weight, weight_class_id, length, width, height, length_class_id, subtract, minimum, sort_order, status, date_added, date_modified, viewed) 
+				      VALUES ('".strip_tags($parameter->descricaoComplementar)."', '".strip_tags($parameter->codigo)."','','','','','','','".$parameter->estoqueAtual."','1','','0','0','".$parameter->preco."','0', '9','".date('Y-m-d')."', '".$parameter->peso."',	'1','".$parameter->profundidadeProduto."','".$parameter->larguraProduto."','".$parameter->alturaProduto."','1','0','1','0','1', NOW(), NOW(),'0')");
+			
+			
+			$query = $this->db->query("SELECT model, sku, quantity, MAX(product_id) as maximo FROM `" . DB_PREFIX . "product`");
+			return $query->rows;
+	}		
+	
+	public function insert_oc_description($parameter, $id){
+		$sql = $this->db->query("INSERT INTO " . DB_PREFIX . "product_description (`product_id`, `language_id`, `name`, `description`, `meta_description`, `meta_keyword`, `tag`)
+			   					  VALUES('".$id."','". (int)$this->config->get('config_language_id')."','".strip_tags($parameter->nome)."','".strip_tags($parameter->descricaoProdFornecedor)."','','','')");
+		
+		$query = $this->db->query("SELECT MAX(product_id) as idMax FROM " . DB_PREFIX . "product_description`");
+		return $query->rows;
+	}
+
+	public function delete_oc_products($id){
+		$del = $this->db->query("DELETE FROM `" . DB_PREFIX . "product` WHERE product_id = '".$id."'");
+		return true;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
