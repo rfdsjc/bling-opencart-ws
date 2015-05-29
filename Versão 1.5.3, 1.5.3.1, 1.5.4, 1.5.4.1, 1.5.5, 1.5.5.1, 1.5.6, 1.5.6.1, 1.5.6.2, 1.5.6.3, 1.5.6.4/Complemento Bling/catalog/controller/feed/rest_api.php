@@ -4,7 +4,6 @@ class ControllerFeedRestApi extends Controller {
 
 	private $debugIt = false;
 	
-	
 	/*
 	* Get products
 	*/
@@ -16,22 +15,30 @@ class ControllerFeedRestApi extends Controller {
 		
 		if(count($products)){
 			foreach ($products as $product) {
-				$products[] = array(
+
+			$variation = $this->model_catalog_product->getVariation($product);
+
+			if(empty($variation[0])){
+				$variation =  null;
+			}
+				$aProducts[] = array(
 								'id'			=> $product['product_id'],
 								'name'			=> $product['name'],
-								'description'	=> $product['description'],
+								'description'		=> $product['description'],
 								'model'			=> $product['model'],
 								'sku'			=> $product['sku'],
 								'quantity'		=> $product['quantity'],
+								'price'			=> $product['price'],
 								'weight'		=> $product['weight'],
 								'length'		=> $product['length'],
 								'width'			=> $product['width'],
 								'height'		=> $product['height'],
-								'attribute'		=> $product['attribute']
+								'attribute'		=> $product['attribute'],
+								'variation'		=> $variation
 								);
 			}
 			$json['success'] 	= true;
-			$json['products'] 	= $products;
+			$json['products'] 	= $aProducts;
 		}else {
 			$json['success'] 	= false;
 			$json['error'] 	= "Problems Getting Products.";
@@ -81,22 +88,30 @@ class ControllerFeedRestApi extends Controller {
 		
 		if(count($products)){
 			foreach ($products as $product) {
-				$products[] = array(
-						'id'			=> $product['product_id'],
-						'name'			=> $product['name'],
-						'description'	=> $product['description'],
-						'model'			=> $product['model'],
-						'sku'			=> $product['sku'],
-						'quantity'		=> $product['quantity'],
-						'weight'		=> $product['weight'],
-						'length'		=> $product['length'],
-						'width'			=> $product['width'],
-						'height'		=> $product['height'],
-						'attribute'		=> $product['attribute']
-				);
+				
+				$variation = $this->model_catalog_product->getVariation($product);
+
+			if(empty($variation[0])){
+				$variation =  null;
+			}
+				$aProducts[] = array(
+								'id'			=> $product['product_id'],
+								'name'			=> $product['name'],
+								'description'		=> $product['description'],
+								'model'			=> $product['model'],
+								'sku'			=> $product['sku'],
+								'quantity'		=> $product['quantity'],
+								'price'			=> $product['price'],
+								'weight'		=> $product['weight'],
+								'length'		=> $product['length'],
+								'width'			=> $product['width'],
+								'height'		=> $product['height'],
+								'attribute'		=> $product['attribute'],
+								'variation'		=> $variation
+								);
 			}
 			$json['success'] 	= true;
-			$json['products'] 	= $products;
+			$json['products'] 	= $aProducts;
 		}else {
 			$json['success'] 	= false;
 			$json['error'] 	= "There are no products on this Period.";
@@ -120,8 +135,6 @@ class ControllerFeedRestApi extends Controller {
 		$method = 'GET';
 		$link = "http://bling.com.br/Integrations/Export/class-opencart-export-product.php?auth=" . base64_encode($this->config->get('rest_api_key')) . "&parameters=". $parameters;
 		
-		$json['link'] 	=  $link;
-		
 		// create curl resource
 		$ch = curl_init();
 		
@@ -142,23 +155,11 @@ class ControllerFeedRestApi extends Controller {
 			// close curl resource to free up system resources
 			curl_close($ch);
 
-
-
-
 			$result = json_decode( $return );
 			
-			
-			
-			$json['return'] 	=  $return;
-
-			
 			$products = $this->model_catalog_product->insert_oc_products($result);
-			
-			$json['products'] 	=  $products;
-			
 			foreach ($products as $prod){
 				$description  = $this->model_catalog_product->insert_oc_description($result, $prod['maximo']);
-				$json['description'] 	=  $description;
 				foreach ($description as $desc){
 					if($desc['idMax'] != $prod['maximo']){
 						$this->model_catalog_product->delete_oc_products($prod['maximo']);
@@ -179,9 +180,38 @@ class ControllerFeedRestApi extends Controller {
 			$this->response->setOutput(json_encode($json));
 		}
 	}
+
+	//products_stock
+	public function products_stock() {
+		$this->checkPlugin();
+		$this->load->model('catalog/product');
 	
+		$parameters =  urldecode($this->getParameter());
+		$exp = explode("|", $parameters);
+		
+		$tipo = $exp[0];
+		$id = $exp[1];
+		$qtd = $exp[2];
+
+		if($tipo == 'P' ){
+			$products = $this->model_catalog_product->update_stock_product($id, $qtd);
+		}else{	
+			$products = $this->model_catalog_product->update_stock_variation($id, $qtd);
+		}
+		
+		$json['success'] = $products;
+
+		if ($this->debugIt) {
+			echo '<pre>';
+			print_r($json);
+			echo '</pre>';
+		} else {
+			$this->response->setOutput(json_encode($json));
+		}
+	}
 	
-	
+
+
 	//All orders
 	public function orders() {	
 		$this->checkPlugin();
@@ -309,17 +339,26 @@ class ControllerFeedRestApi extends Controller {
 		$products = $params;
 		$produtos = array();
 		foreach ($products as $product){
+			
+			$variation = $this->model_account_order->getVariation($product);
+
+
+			if(empty($variation[0])){
+				$variation = null;	
+			}
+
 			$produtos[] = array(
-					'order_product_id'  =>  $product['order_product_id'],
-					'product_id'  		=>  $product['product_id'],
-					'name'		 		=>  $product['name'],
-					'model' 	  		=>  $product['model'],
-					'sku' 	  			=>  $product['sku'],
+					'order_product_id'  	=>  $product['order_product_id'],
+					'product_id'  	    	=>  $product['product_id'],
+					'name'		 	=>  $product['name'],
+					'model' 	  	=>  $product['model'],
+					'sku' 	  		=>  $product['sku'],
 					'quantity'    		=>  $product['quantity'],
-					'price'  	 		=>  $product['price'],
-					'total'  	 		=>  $product['total'],
-					'tax'  		 		=>  $product['tax'],
-					'rewar'  	 		=>  $product['reward']
+					'price'  	 	=>  $product['price'],
+					'total'  	 	=>  $product['total'],
+					'tax'  		 	=>  $product['tax'],
+					'rewar'  	 	=>  $product['reward'],
+					'variation'		=>  $variation
 			);
 		}
 		return $produtos;		
@@ -436,7 +475,7 @@ class ControllerFeedRestApi extends Controller {
 		/*validate api security key*/
 		if ($this->config->get('rest_api_key') && (!isset($this->request->get['key']) || $this->request->get['key'] != $this->config->get('rest_api_key'))) {
 			$json["error"] = 'Invalid secret key';
-		}
+		}	
 		
 		if(isset($json["error"])){
 			$this->response->addHeader('Content-Type: application/json');

@@ -639,5 +639,36 @@ class ModelCatalogProduct extends Model {
 		$del = $this->db->query("DELETE FROM `" . DB_PREFIX . "product` WHERE product_id = '".$id."'");
 		return true;
 	}
+	
+	//Get products variations
+	public function getVariation($parameters){
+	
+		$query = $this->db->query("SELECT pd.name as variationName, od.name as nomeTipoVariacao,  ovd.name as tipoVariacao, pov.quantity as quantidadeVariacao, pov.price as precoVaricao, pov.price_prefix as prefixPrecoVaricao,  pov.weight as   pesoVaricao, pov.weight_prefix as prefixPesoVaricao, pov.product_option_value_id as idVariation
+					   FROM " . DB_PREFIX . "option_description od
+					   LEFT JOIN " . DB_PREFIX . "option_value_description ovd ON ( od.option_id = ovd.option_id )
+					   LEFT JOIN " . DB_PREFIX . "product_option_value pov ON ( ovd.option_value_id = pov.option_value_id )
+					   LEFT JOIN " . DB_PREFIX . "product_description pd ON ( pov.product_id = pd.product_id )
+			   		   WHERE pd.product_id = '".$parameters['product_id']."'");
+		return $query->rows;
+	}
+	
+	public function update_stock_product($id, $qtd){
+		$up = $this->db->query("UPDATE `" . DB_PREFIX . "product` SET `quantity`= '" . $qtd . "' WHERE  `product_id` = '" . $id . "'");
+		if($up){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public function update_stock_variation($id, $qtd){
+		$up = $this->db->query("UPDATE `" . DB_PREFIX . "product_option_value` SET `quantity`= '" . $qtd . "' WHERE  `product_option_value_id` = '" . $id . "' ");
+		if($up){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
 }
 ?>
