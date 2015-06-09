@@ -671,4 +671,3 @@ class ModelCatalogProduct extends Model {
 	}
 	
 }
-?>

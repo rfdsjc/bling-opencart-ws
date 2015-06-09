@@ -279,10 +279,9 @@ class ModelAccountOrder extends Model {
 		$query = $this->db->query("SELECT op.name as variationName, oo.name as nomeTipoVariacao, oo.value as tipoVariacao, opov.price as precoVaricao,  opov.price_prefix as prefixPrecoVaricao,  opov.weight as pesoVaricao, opov.weight_prefix as prefixPesoVaricao
 				           FROM " . DB_PREFIX . "order_product op LEFT JOIN " . DB_PREFIX . "order_option oo ON (op.order_product_id = oo.order_product_id )
 					   LEFT JOIN " . DB_PREFIX . "product_option_value  opov ON (oo.product_option_value_id = opov.product_option_value_id)
-					   WHERE op.order_id = '".$parameters['order_id']."' AND op.order_product_id = '".$parameters['order_product_id']."' AND oo.order_product_id is not null");
+					   WHERE op.order_product_id = '".$parameters['order_product_id']."' AND oo.order_product_id is not null");
 	
 		return $query->rows;
 	}
 	
 }
-?>
