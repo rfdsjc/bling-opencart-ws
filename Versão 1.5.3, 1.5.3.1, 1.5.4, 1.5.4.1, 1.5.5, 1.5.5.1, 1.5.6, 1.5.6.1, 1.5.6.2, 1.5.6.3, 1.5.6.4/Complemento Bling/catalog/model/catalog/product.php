@@ -631,7 +631,7 @@ class ModelCatalogProduct extends Model {
 		$sql = $this->db->query("INSERT INTO " . DB_PREFIX . "product_description (`product_id`, `language_id`, `name`, `description`, `meta_description`, `meta_keyword`, `tag`)
 			   					  VALUES('".$id."','". (int)$this->config->get('config_language_id')."','".strip_tags($parameter->nome)."','".strip_tags($parameter->descricaoProdFornecedor)."','','','')");
 		
-		$query = $this->db->query("SELECT MAX(product_id) as idMax FROM " . DB_PREFIX . "product_description`");
+		$query = $this->db->query("SELECT MAX(product_id) as idMax FROM " . DB_PREFIX . "product_description");
 		return $query->rows;
 	}
 
