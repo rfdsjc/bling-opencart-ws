@@ -134,7 +134,7 @@ class ControllerFeedRestApi extends Controller {
 		$parameters =  urldecode($this->getParameter());
 		$method = 'GET';
 		$link = "http://bling.com.br/Integrations/Export/class-opencart-export-product.php?auth=" . base64_encode($this->config->get('rest_api_key')) . "&parameters=". $parameters;
-		
+
 		// create curl resource
 		$ch = curl_init();
 		
@@ -154,24 +154,21 @@ class ControllerFeedRestApi extends Controller {
 		}else{		
 			// close curl resource to free up system resources
 			curl_close($ch);
-
 			$result = json_decode( $return );
-			
 			$products = $this->model_catalog_product->insert_oc_products($result);
 			foreach ($products as $prod){
 				$description  = $this->model_catalog_product->insert_oc_description($result, $prod['maximo']);
 				foreach ($description as $desc){
 					if($desc['idMax'] != $prod['maximo']){
 						$this->model_catalog_product->delete_oc_products($prod['maximo']);
-						$json['success'] 	= false;
-						$json['error'] 	= "Problems Saving Products.";
+						$json['success'] = false;
+						$json['error'] 	 = "Problems Saving Products.";
 					}else{
-						$json['success'] 	= true;
+						$json['success'] = true;
 					}	
 				}
 			}
 		}
-		
 		if ($this->debugIt) {
 			echo '<pre>';
 			print_r($json);
@@ -487,3 +484,4 @@ class ControllerFeedRestApi extends Controller {
 	}	
 
 }
+
