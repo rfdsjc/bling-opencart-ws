@@ -24,7 +24,7 @@ class ControllerFeedRestApi extends Controller {
 				$aProducts[] = array(
 								'id'			=> $product['product_id'],
 								'name'			=> $product['name'],
-								'description'		=> $product['description'],
+								'description'	=> $product['description'],
 								'model'			=> $product['model'],
 								'sku'			=> $product['sku'],
 								'quantity'		=> $product['quantity'],
@@ -97,7 +97,7 @@ class ControllerFeedRestApi extends Controller {
 				$aProducts[] = array(
 								'id'			=> $product['product_id'],
 								'name'			=> $product['name'],
-								'description'		=> $product['description'],
+								'description'	=> $product['description'],
 								'model'			=> $product['model'],
 								'sku'			=> $product['sku'],
 								'quantity'		=> $product['quantity'],
