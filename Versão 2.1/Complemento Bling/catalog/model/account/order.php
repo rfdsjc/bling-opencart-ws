@@ -168,34 +168,13 @@ class ModelAccountOrder extends Model {
 
 		return $query->row['total'];
 	}
-	
-	
-	//Plugin
-	public function getAllOrders($start = 0, $limit = 20) {
-		if ($start < 0) {
-			$start = 0;
-		}
 
-		if ($limit < 1) {
-			$limit = 1;
-		}
-	
-		$query = $this->db->query("SELECT o.order_id, o.firstname, o.lastname,o.email, o.telephone, o.total, o.currency_code, o.currency_value, o.customer_id,o.date_added,o.payment_firstname,o.payment_lastname,o.payment_company,o.payment_address_1,o.payment_address_2,o.payment_city,o.payment_postcode,o.payment_country,o.payment_zone,o.payment_method,o.payment_code,o.shipping_firstname,o.shipping_lastname,o.shipping_company,o.shipping_address_1,o.shipping_address_2,o.shipping_city,o.shipping_postcode,o.shipping_country,o.shipping_zone,o.shipping_method,o.shipping_code,o.comment, os.name as status
-								   FROM `" . DB_PREFIX . "order` o LEFT JOIN " . DB_PREFIX . "order_status os ON (o.order_status_id = os.order_status_id) 
-								   WHERE o.order_status_id > '0'  ORDER BY o.order_id DESC LIMIT " . (int)$start . "," . (int)$limit
-								  );
-		return $query->rows;
-		
-	}
 	
 	
-	
-	/***
-	 * 
-	 * ORDERS
-	 * 
-	 ***/
-	
+	####################################
+	############# BLING ################
+	####################################
+
 	//ORDERS BY FILTERS
 	public function getAllOrdersFilters($start = 0, $limit = 20, $filters) {
 		if ($start < 0) {
@@ -220,15 +199,6 @@ class ModelAccountOrder extends Model {
 		$sql = "SELECT o.order_id, o.firstname, o.lastname, o.email, o.telephone, o.total, o.currency_code, o.currency_value, o.customer_id,o.date_added,o.payment_firstname,o.payment_lastname,o.payment_company,o.payment_address_1,o.payment_address_2,o.payment_city,o.payment_postcode,o.payment_country,o.payment_zone,o.payment_method,o.payment_code,o.shipping_firstname,o.shipping_lastname,o.shipping_company,o.shipping_address_1,o.shipping_address_2,o.shipping_city,o.shipping_postcode,o.shipping_country,o.shipping_zone,o.shipping_method,o.shipping_code,o.comment, os.name as status
 								   FROM `" . DB_PREFIX . "order` o LEFT JOIN " . DB_PREFIX . "order_status os ON (o.order_status_id = os.order_status_id)
 								   WHERE ";
-
-
-		/*$sql = "SELECT o.order_id, o.firstname, o.lastname, o.email, o.telephone, o.total, o.currency_code, o.currency_value, o.customer_id, o.date_added, o.payment_firstname, o.payment_lastname, 				o.payment_company, o.payment_address_1, o.payment_address_2, o.payment_city, o.payment_postcode, o.payment_country, o.payment_zone, o.payment_method, o.payment_code, 				o.shipping_firstname, o.shipping_lastname, o.shipping_company, o.shipping_address_1, o.shipping_address_2, o.shipping_city, o.shipping_postcode, o.shipping_country, 				o.shipping_zone,o.shipping_method, o.shipping_code,o.comment, os.name as status, oo.name as nomeVariacao, oo.value as valorVariacao, opov.price as precoVariacao, opov.price_prefix, 				opov.weight as weightVariacao , opov.weight_prefix
-
-			FROM `oc_order` o LEFT JOIN oc_order_status os ON (o.order_status_id = os.order_status_id) LEFT JOIN oc_order_option oo ON (o.order_id = oo.order_id)  LEFT JOIN oc_product_option_value 				opov ON (oo.product_option_value_id = opov.product_option_value_id)
-
-			WHERE ";*/
-
-
 
 		if($status == 'tds'){
 			$sql .= "o.order_status_id > 0";

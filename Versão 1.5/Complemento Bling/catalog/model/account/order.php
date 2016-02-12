@@ -173,7 +173,10 @@ class ModelAccountOrder extends Model {
 	
 	
 	
-	//Plugin
+	####################################
+	############# BLING ################
+	####################################
+	
 	public function getAllOrders($start = 0, $limit = 20) {
 		if ($start < 0) {
 			$start = 0;
@@ -190,14 +193,6 @@ class ModelAccountOrder extends Model {
 		return $query->rows;
 		
 	}
-	
-	
-	
-	/***
-	 * 
-	 * ORDERS
-	 * 
-	 ***/
 	
 	//ORDERS BY FILTERS
 	public function getAllOrdersFilters($start = 0, $limit = 20, $filters) {
