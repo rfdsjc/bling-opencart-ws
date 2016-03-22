@@ -116,4 +116,3 @@
 		return $query->rows;
 	}
 
-}
