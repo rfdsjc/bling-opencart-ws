@@ -56,7 +56,7 @@
 				$query = $this->db->query("SELECT model, sku, quantity, MAX(product_id) as maximo FROM `" . DB_PREFIX . "product`");
 				return $query->rows;
 			}else{
-				$sql = $this->db->query("UPDATE " . DB_PREFIX . "product SET	model = '".strip_tags($parameter->descricaoComplementar)."', sku = '".strip_tags($parameter->codigo)."', quantity = '".$parameter->estoqueAtual."'price = '".$parameter->preco."', weight = '".$parameter->peso."', length = '".$parameter->profundidadeProduto."', width = '".$parameter->larguraProduto."', height = '".$parameter->alturaProduto."',	date_modified = NOW() WHERE product_id = '" . $parameter->id."'";
+				$sql = $this->db->query("UPDATE " . DB_PREFIX . "product SET	model = '".strip_tags($parameter->descricaoComplementar)."', sku = '".strip_tags($parameter->codigo)."', quantity = '".$parameter->estoqueAtual."', price = '".$parameter->preco."', weight = '".$parameter->peso."', length = '".$parameter->profundidadeProduto."', width = '".$parameter->larguraProduto."', height = '".$parameter->alturaProduto."', date_modified = NOW()  WHERE product_id = '" . $parameter->id."'");
 				return array();				
 			}
 	}		
