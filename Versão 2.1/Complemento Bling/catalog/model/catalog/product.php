@@ -52,14 +52,15 @@
 				$parameter->descricaoComplementar = substr($parameter->descricaoComplementar, 0, 64);
 			}
 						
-			if($parameter->id > 0){
+			$idProd = (int)$parameter->id;
+			if($idProd == 0){
 				$sql = $this->db->query("INSERT INTO " . DB_PREFIX . "product (model, sku, upc, ean, jan, isbn, mpn, location, quantity, stock_status_id, image, manufacturer_id, shipping, price, points, tax_class_id, date_available, weight, weight_class_id, length, width, height, length_class_id, subtract, minimum, sort_order, status, viewed, date_added, date_modified ) 
 					     		 VALUES ('".strip_tags($parameter->descricaoComplementar)."', '".strip_tags($parameter->codigo)."','','','','','','','".$parameter->estoqueAtual."','1','','0','0','".$parameter->preco."','0', '9','".date('Y-m-d')."', '".$parameter->peso."',	'1','".$parameter->profundidadeProduto."','".$parameter->larguraProduto."','".$parameter->alturaProduto."','1','0','1','0','1','0', NOW(), NOW())");
 				
 				$query = $this->db->query("SELECT model, sku, quantity, MAX(product_id) as maximo FROM `" . DB_PREFIX . "product`");
 				return $query->rows;
 			}else{
-				$sql = $this->db->query("UPDATE " . DB_PREFIX . "product SET	model = '".strip_tags($parameter->descricaoComplementar)."', sku = '".strip_tags($parameter->codigo)."', quantity = '".$parameter->estoqueAtual."', price = '".$parameter->preco."', weight = '".$parameter->peso."', length = '".$parameter->profundidadeProduto."', width = '".$parameter->larguraProduto."', height = '".$parameter->alturaProduto."', date_modified = NOW()  WHERE product_id = '" . $parameter->id."'");
+				$sql = $this->db->query("UPDATE " . DB_PREFIX . "product SET	model = '".strip_tags($parameter->descricaoComplementar)."', sku = '".strip_tags($parameter->codigo)."', quantity = '".$parameter->estoqueAtual."', price = '".$parameter->preco."', weight = '".$parameter->peso."', length = '".$parameter->profundidadeProduto."', width = '".$parameter->larguraProduto."', height = '".$parameter->alturaProduto."', date_modified = NOW()  WHERE product_id = '" . $idProd."'");
 				return array();				
 			}
 	}		
