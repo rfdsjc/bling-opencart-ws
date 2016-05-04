@@ -17,25 +17,27 @@ class ControllerFeedRestApi extends Controller {
 			foreach ($products as $product) {
 
 			$variation = $this->model_catalog_product->getVariation($product);
-
-			if(empty($variation[0])){
-				$variation =  null;
-			}
-				$aProducts[] = array(
-								'id'			=> $product['product_id'],
-								'name'			=> $product['name'],
-								'description'	=> $product['description'],
-								'model'			=> $product['model'],
-								'sku'			=> $product['sku'],
-								'quantity'		=> $product['quantity'],
-								'price'			=> $product['price'],
-								'weight'		=> $product['weight'],
-								'length'		=> $product['length'],
-								'width'			=> $product['width'],
-								'height'		=> $product['height'],
-								'attribute'		=> $product['attribute'],
-								'variation'		=> $variation
-								);
+	
+				if(empty($variation[0])){
+					$variation =  null;
+				}
+				if(!empty($product['name'])){
+					$aProducts[] = array(
+									'id'			=> $product['product_id'],
+									'name'			=> $product['name'],
+									'description'	=> strip_tags(preg_replace('/<[^>]*>/','',str_replace(array("&nbsp;","\n","\r"),"",html_entity_decode($product['description'],ENT_QUOTES,'UTF-8')))),
+									'model'			=> strip_tags(preg_replace('/<[^>]*>/','',str_replace(array("&nbsp;","\n","\r"),"",html_entity_decode($product['model'],ENT_QUOTES,'UTF-8')))),
+									'sku'			=> $product['sku'],
+									'quantity'		=> $product['quantity'],
+									'price'			=> $product['price'],
+									'weight'		=> $product['weight'],
+									'length'		=> $product['length'],
+									'width'			=> $product['width'],
+									'height'		=> $product['height'],
+									'attribute'		=> $product['attribute'],
+									'variation'		=> $variation
+									);
+				}
 			}
 			$json['success'] 	= true;
 			$json['products'] 	= $aProducts;
