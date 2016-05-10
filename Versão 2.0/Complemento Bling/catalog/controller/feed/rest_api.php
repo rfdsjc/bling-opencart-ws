@@ -166,6 +166,7 @@ class ControllerFeedRestApi extends Controller {
 						$json['success'] = false;
 						$json['error'] 	 = "Problems Saving Products.";
 					}else{
+						$json['idProduto'] = $prod['maximo'];
 						$json['success'] = true;
 					}	
 				}
