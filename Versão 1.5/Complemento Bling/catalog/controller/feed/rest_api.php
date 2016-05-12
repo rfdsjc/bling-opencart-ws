@@ -130,13 +130,13 @@ class ControllerFeedRestApi extends Controller {
 	}
 	
 	//insert Products
-	public function products_insert() {
+public function products_insert() {
 		$this->checkPlugin();
 		$this->load->model('catalog/product');
 	
 		$parameters =  urldecode($this->getParameter());
 		$method = 'GET';
-		$link = "http://bling.com.br/Integrations/Export/class-opencart-export-product.php?auth=" . base64_encode($this->config->get('rest_api_key')) . "&parameters=". $parameters;
+		$link = "https://www.bling.com.br/Integrations/Export/class-opencart-export-product.php?auth=" . base64_encode($this->config->get('rest_api_key')) . "&parameters=". $parameters;
 
 		// create curl resource
 		$ch = curl_init();
@@ -148,28 +148,49 @@ class ControllerFeedRestApi extends Controller {
 		
 		// $return contains the output string
 		$return = curl_exec( $ch );
-		
+		curl_close($ch);
+		$result = json_decode( $return );
+
 		//Obter o erro de url
 		$code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
 		if ( empty( $return ) ) {
 			$json['success'] 	= false;
 			$json['error'] 	= "cURL HTTP error " . $code;
-		}else{		
-			// close curl resource to free up system resources
-			curl_close($ch);
-			$result = json_decode( $return );
+			$json['url'] 	= $link;
+		}else{	
+
 			$products = $this->model_catalog_product->insert_oc_products($result);
-			foreach ($products as $prod){
-				$description  = $this->model_catalog_product->insert_oc_description($result, $prod['maximo']);
-				foreach ($description as $desc){
-					if($desc['idMax'] != $prod['maximo']){
-						$this->model_catalog_product->delete_oc_products($prod['maximo']);
-						$json['success'] = false;
-						$json['error'] 	 = "Problems Saving Products.";
-					}else{
-						$json['idProduto'] = $prod['maximo'];
+			
+			if(isset($products['id'])){
+				if($products['returnUp']){
+					$description  = $this->model_catalog_product->update_oc_description($result, $products['id']);
+					$json['desc'] = $description;
+				
+					if($description){
+						$json['idProduto'] = $products['id'];
 						$json['success'] = true;
-					}	
+					}else{
+						$json['success'] = false;
+						$json['error'] 	 = "Problems Saving Descripton Product. ";				
+					}
+				}else{
+					$json['success'] = false;
+					$json['error'] 	 = "Problems Updating Product";
+				}
+			}else{
+				foreach ($products as $prod){
+					$description  = $this->model_catalog_product->insert_oc_description($result, $prod['maximo']);
+					foreach ($description as $desc){
+						if($desc['idMax'] != $prod['maximo']){
+							$this->model_catalog_product->delete_oc_products($prod['maximo']);
+							$json['success'] = false;
+							$json['error'] 	 = "Problems Saving Products.";
+						}else{
+							$json['idProduto'] = $prod['maximo'];
+							$json['success'] = true;
+						}	
+					}
+
 				}
 			}
 		}

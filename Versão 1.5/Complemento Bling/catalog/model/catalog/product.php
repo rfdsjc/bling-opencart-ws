@@ -40,9 +40,6 @@
 		return $query->rows;
 	}
 	
-	
-	
-	
 	//Insert products
 	public function insert_oc_products($parameter){
 			if(strlen($parameter->descricaoComplementar) > 64){
@@ -57,9 +54,14 @@
 				return $query->rows;
 			}else{
 				$sql = $this->db->query("UPDATE " . DB_PREFIX . "product SET	model = '".strip_tags($parameter->descricaoComplementar)."', sku = '".strip_tags($parameter->codigo)."', quantity = '".$parameter->estoqueAtual."', price = '".$parameter->preco."', weight = '".$parameter->peso."', length = '".$parameter->profundidadeProduto."', width = '".$parameter->larguraProduto."', height = '".$parameter->alturaProduto."', date_modified = NOW()  WHERE product_id = '" . $idProd ."'");
-				return array();				
+				return array('id' => $idPrd, 'returnUp' => $sql);			
 			}
 	}		
+	
+	public function update_oc_description($parameter, $id){
+		$sql = $this->db->query("UPDATE " . DB_PREFIX . "product_description SET `name` =  '".strip_tags($parameter->nome)."', `description` = '".strip_tags($parameter->descricaoProdFornecedor)."' WHERE `product_id` = '".$id."'");
+		return $sql;
+	}
 	
 	public function insert_oc_description($parameter, $id){
 		$sql = $this->db->query("INSERT INTO " . DB_PREFIX . "product_description (`product_id`, `language_id`, `name`, `description`, `meta_description`, `meta_keyword`, `tag`)
