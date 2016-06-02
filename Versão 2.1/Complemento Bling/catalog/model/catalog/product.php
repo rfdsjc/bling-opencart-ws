@@ -63,13 +63,13 @@
 	}		
 	
 	public function update_oc_description($parameter, $id){
-		$sql = $this->db->query("UPDATE " . DB_PREFIX . "product_description SET `name` =  '".strip_tags($parameter->nome)."', `description` = '".strip_tags($parameter->descricaoComplementar)."' WHERE `product_id` = '".$id."'");
+		$sql = $this->db->query("UPDATE " . DB_PREFIX . "product_description SET `name` =  '".strip_tags($parameter->nome)."', `description` = '".htmlentities($parameter->descricaoComplementar)."' WHERE `product_id` = '".$id."'");
 		return $sql;
 	}
 	
 	public function insert_oc_description($parameter, $id){
 		$sql = $this->db->query("INSERT INTO " . DB_PREFIX . "product_description (`product_id`, `language_id`, `name`, `description`, `tag`, `meta_title`, `meta_description`, `meta_keyword`)
-			   		 VALUES('".$id."','". (int)$this->config->get('config_language_id')."','".strip_tags($parameter->nome)."','".strip_tags($parameter->descricaoComplementar)."','','','','')");
+			   		 VALUES('".$id."','". (int)$this->config->get('config_language_id')."','".strip_tags($parameter->nome)."','".htmlentities($parameter->descricaoComplementar)."','','','','')");
 		
 		$query = $this->db->query("SELECT MAX(product_id) as idMax FROM " . DB_PREFIX . "product_description");
 		return $query->rows;

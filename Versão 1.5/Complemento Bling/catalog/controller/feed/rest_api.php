@@ -99,8 +99,8 @@ class ControllerFeedRestApi extends Controller {
 					$aProducts[] = array(
 									'id'			=> $product['product_id'],
 									'name'			=> $product['name'],
-									'description'	=> strip_tags(preg_replace('/<[^>]*>/','',str_replace(array("&nbsp;","\n","\r"),"",html_entity_decode($product['description'],ENT_QUOTES,'UTF-8')))),
-									'model'			=> strip_tags(preg_replace('/<[^>]*>/','',str_replace(array("&nbsp;","\n","\r"),"",html_entity_decode($product['model'],ENT_QUOTES,'UTF-8')))),
+									'description'		=> 'b64'.base64_encode($product['description']),
+									'model'			=> 'b64'.base64_encode($product['model']),
 									'sku'			=> $product['sku'],
 									'quantity'		=> $product['quantity'],
 									'price'			=> $product['price'],
