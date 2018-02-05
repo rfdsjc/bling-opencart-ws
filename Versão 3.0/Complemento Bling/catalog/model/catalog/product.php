@@ -58,7 +58,7 @@
 				return $query->rows;
 			}else{
 				$sql = $this->db->query("UPDATE " . DB_PREFIX . "product SET	model = '".strip_tags($parameter->descricaoComplementar)."', sku = '".strip_tags($parameter->codigo)."', quantity = '".$parameter->estoqueAtual."', price = '".$parameter->preco."', weight = '".$parameter->peso."', length = '".$parameter->profundidadeProduto."', width = '".$parameter->larguraProduto."', height = '".$parameter->alturaProduto."', date_modified = NOW()  WHERE product_id = '" . $idProd."'");
-				return array('id' => $idPrd, 'returnUp' => $sql);			
+				return array('id' => $idProd, 'returnUp' => $sql);			
 			}
 	}		
 	
