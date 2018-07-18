@@ -24,8 +24,8 @@ class ControllerFeedRestApi extends Controller {
 				$aProducts[] = array(
 								'id'			=> $product['product_id'],
 								'name'			=> $product['name'],
-								'description'	=> $product['description'],
-								'model'			=> $product['model'],
+								'description'		=> 'b64'.base64_encode($product['description']),
+								'model'			=> 'b64'.base64_encode($product['model']),
 								'sku'			=> $product['sku'],
 								'quantity'		=> $product['quantity'],
 								'price'			=> $product['price'],
